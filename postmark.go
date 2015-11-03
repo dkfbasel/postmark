@@ -4,7 +4,6 @@ package postmark
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 )
 
@@ -30,7 +29,7 @@ type Response struct {
 }
 
 // Send swill send a single message to the server
-func (service *Service) Send(msg *Message) (*Result, error) {
+func (service *Service) Send(msg *Message) (*Response, error) {
 
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(msg)
@@ -39,11 +38,11 @@ func (service *Service) Send(msg *Message) (*Result, error) {
 	}
 
 	// send the data through postmark
-	return sendMessageThroughPostmark(&buf, "email")
+	return service.sendMessageThroughPostmark(&buf, "email")
 }
 
 // SendWithTemplate will send a message using a pre-specified template
-func (service *Service) SendWithTemplate(msg *MessageWithTemplate) (*Result, error) {
+func (service *Service) SendWithTemplate(msg *MessageWithTemplate) (*Response, error) {
 
 	// marshal the message
 	buf := bytes.Buffer{}
@@ -52,14 +51,12 @@ func (service *Service) SendWithTemplate(msg *MessageWithTemplate) (*Result, err
 		return nil, err
 	}
 
-	fmt.Printf("%v\n", buf)
-
 	// send the data through postmark
 	return service.sendMessageThroughPostmark(&buf, "email/withTemplate")
 }
 
 // SendBatch will send multiple messages using the batch API
-func (service *Service) SendBatch(msg []*Message) (*Result, error) {
+func (service *Service) SendBatch(msg []*Message) (*Response, error) {
 
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(msg)
@@ -67,20 +64,18 @@ func (service *Service) SendBatch(msg []*Message) (*Result, error) {
 		return nil, err
 	}
 
-	fmt.Printf("%v\n", buf)
-
 	// send the data through postmark
 	return service.sendMessageThroughPostmark(&buf, "email/batch")
 }
 
 // sendMessageThroughPostmark will perform the sending operation
-func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path string) (*Result, error) {
+func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path string) (*Response, error) {
 
 	// create an endpoint url (with https and host address)
-	url := makeEndpoint(service.host, path)
+	url := makeEndpoint(service.Host, path)
 
 	// create a new request
-	req, err := http.NewRequest("POST", url, content)
+	req, err := http.NewRequest("POST", url.String(), content)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +83,7 @@ func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path s
 	// add headers for the postmark api
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Postmark-Server-Token", service.ApiKey)
+	req.Header.Set("X-Postmark-Server-Token", service.APIKey)
 
 	// perform the request
 	resp, err := (&http.Client{}).Do(req)
@@ -97,7 +92,7 @@ func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path s
 	}
 
 	// parse the results
-	res := &Result{}
-	json.NewDecoder(resp.Body).Decode(res)
-	return res, nil
+	response := &Response{}
+	json.NewDecoder(resp.Body).Decode(response)
+	return response, nil
 }
