@@ -1,10 +1,5 @@
 package postmark
 
-const (
-	// DefaultHost is used to hold the standard config to send messages to
-	DefaultHost = "api.postmarkapp.com"
-)
-
 // Message will contain the basic information for an email message
 type Message struct {
 	From string `json:",omitempty"`
