@@ -1,10 +1,5 @@
-# Postmark module
-Convenience wrapper for the postmarkapi.com email service. An example of the 
-usage is given below. Batch email sending and postmark templates are also 
-supported. The package does not depend on any other packages outside the standard
-go library.
+package postmark_test
 
-```golang
 import (
 	"fmt"
 	"log"
@@ -39,4 +34,3 @@ func ExampleService() {
 
 	fmt.Printf("%#v\n", response)
 }
-```

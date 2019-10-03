@@ -2,50 +2,28 @@ package postmark
 
 import (
 	"net/mail"
-	"net/url"
 	"strings"
 )
 
-// addressesToList will join a list of addresses to a comma separated list
-func addressesToList(addresses []*mail.Address) string {
+// Address will return a from/to compatible string of the given contact
+func Address(name, email string) string {
+	address := mail.Address{
+		Name:    name,
+		Address: email,
+	}
+	return address.String()
+}
 
+// Addresses will join a list of addresses to a comma separated list
+func Addresses(addresses ...mail.Address) string {
 	list := []string{}
-
 	for _, address := range addresses {
 		list = append(list, address.String())
 	}
-
 	return strings.Join(list, ", ")
 }
 
-func transformMailHeaders(mailHeaders mail.Header) []map[string]string {
-
-	headers := []map[string]string{}
-
-	for k, vs := range mailHeaders {
-		for _, v := range vs {
-			headers = append(headers, map[string]string{
-				"Name":  k,
-				"Value": v,
-			})
-		}
-	}
-
-	return headers
-}
-
-func makeEndpoint(host, path string) *url.URL {
-	url := &url.URL{}
-
-	url.Scheme = "https"
-
-	if host == "" {
-		url.Host = DefaultHost
-	} else {
-		url.Host = host
-	}
-
-	url.Path = path
-
-	return url
+// Emails will join a list of email addresses into a comma separated list
+func Emails(emails ...string) string {
+	return strings.Join(emails, ", ")
 }

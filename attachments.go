@@ -5,7 +5,15 @@ import (
 	"encoding/json"
 )
 
-// MarshalJSON will encode attachments to json using custom functionality
+// Attachment should be used to attach files to the emails. Note that the content
+// will be base64 encoded to be sent to the client
+type Attachment struct {
+	Name        string
+	ContentType string
+	Content     []byte
+}
+
+// MarshalJSON will encode attachments to json using custom encoding functionality
 func (attachment *Attachment) MarshalJSON() ([]byte, error) {
 
 	preparedForMarshalling := &struct {
