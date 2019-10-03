@@ -3,6 +3,7 @@ package postmark
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
 )
@@ -16,7 +17,7 @@ func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path s
 	// create a new request
 	req, err := http.NewRequest("POST", url.String(), content)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not initialize post request: %w", err)
 	}
 
 	// add headers for the postmark api
@@ -27,12 +28,15 @@ func (service *Service) sendMessageThroughPostmark(content *bytes.Buffer, path s
 	// perform the request
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not perform post request: %w", err)
 	}
 
 	// parse the results
 	response := &Response{}
-	json.NewDecoder(resp.Body).Decode(response)
+	err = json.NewDecoder(resp.Body).Decode(response)
+	if err != nil {
+		return nil, fmt.Errorf("could not decode server response: %w", err)
+	}
 	return response, nil
 }
 

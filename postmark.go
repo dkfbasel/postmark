@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 )
 
 const (
@@ -57,7 +58,7 @@ func (service *Service) Send(msg *Message) (*Response, error) {
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(msg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not encode email message: %w", err)
 	}
 
 	// send the data through postmark
@@ -76,7 +77,7 @@ func (service *Service) SendWithTemplate(msg *MessageWithTemplate) (*Response, e
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(msg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not encode email message with template: %w", err)
 	}
 
 	// send the data through postmark
@@ -96,7 +97,7 @@ func (service *Service) SendBatch(msg []*Message) (*Response, error) {
 	buf := bytes.Buffer{}
 	err := json.NewEncoder(&buf).Encode(msg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not encode batch email messages: %w", err)
 	}
 
 	// send the data through postmark
