@@ -32,5 +32,6 @@ func ExampleService() {
 		log.Fatalf("could not send the message: %+v\n", err)
 	}
 
-	fmt.Printf("%#v\n", response)
+	fmt.Printf("%s: %s\n", response.Message, response.To)
+	// Output: Test job accepted: someone@dkfbasel.ch, someone-else@dkfbasel.ch
 }
